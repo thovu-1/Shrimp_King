@@ -5,8 +5,21 @@ import asyncio
 import atexit
 import random
 import os
-
+from enum import Enum
 # Function will be used for all shrimp classes to get shrimp size which changes depending on their level.
+import pygame
+# Defining Global Variables and setting up the display
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+DEFAULT_SPAWN_X = SCREEN_WIDTH // 2
+DEFAULT_SPAWN_Y = SCREEN_HEIGHT // 2
+
+class DIRECTION(Enum):
+    RIGHT = "right"
+    LEFT = "left"
+    UP = "up"
+    DOWN = "down"
+
 def get_shrimp_size(image_path, level):
     shrimp_image = pygame.image.load(image_path)
     shrimp_image_height = shrimp_image.get_height()
@@ -21,15 +34,3 @@ def get_shrimp_size(image_path, level):
     else:
         return pygame.transform.scale(pygame.image.load(image_path), SHRIMPLET_SIZE)
 
-def save_user_states(user_data, filename):
-    with open(filename, 'wb') as f:
-        for user in user_data:
-            pickle.dump(user.__dict__, f)  # Save user object attributes
-            # Save shrimps
-            pickle.dump(len(user.shrimps), f)  # Save number of shrimps for iteration during load
-            for shrimp in user.shrimps:
-                pickle.dump({'name': shrimp.name}, f)  # Save pellet attributes
-            # Save pellets
-            pickle.dump(len(user.pellets), f)  # Save number of pellets for iteration during load
-            for pellet in user.pellets:
-                pickle.dump({'type': pellet.type}, f)  # Save pellet attributes

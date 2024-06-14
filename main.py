@@ -1,14 +1,11 @@
 import pygame
-from shrimp_classes import *
-from food_classes import *
-
+from tier_1_classes import *
+from tier_2_classes import *
+from funcs import *
 pygame.init()
 
-# Defining Global Variables and setting up the display
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
-DEFAULT_SPAWN_X = SCREEN_WIDTH // 2
-DEFAULT_SPAWN_Y = SCREEN_HEIGHT // 2
+
+
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Shrimp King')
 
@@ -17,44 +14,26 @@ save_file = 'save_files/user_data.pkl'
 
 # This function will 'unpickle' the data from the user save file.
 def load_user_states(filename): 
-    try:
-        if os.path.exists(filename):
-            with open(filename, 'rb') as f:
-                money = pickle.load(f)
-                selected_pellet = pickle.load(f)
-                num_shrimps = pickle.load(f)
-                shrimps = []
-                pellets = []
-                for _ in range(num_shrimps):
-                    shrimp_state = pickle.load(f)  # Load shrimp state
-                    
-                    match shrimp_state['name']:
-                        case 'CRS':
-                            shrimp = CRS(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, shrimp_state['level'], shrimp_state['food_bar'])
-                            shrimps.append(shrimp)
-                        case _:
-                            print("ADD MORE SHRIMP SPECIES")
 
-                num_pellets = pickle.load(f)
-                for _ in range(num_pellets):
-                    pellet_state = pickle.load(f)  # Load pellet state
-                    match pellet_state['type']:
-                        case 'Algae_Wafer':
-                            pellet = Algae_Wafer(0,0)
-                            pellets.append(pellet)
-                        case _:
-                            print("ADD OTHER PELLETS WHEN LOADING USER STATES")
+        user_data = User.load_data(filename)
 
-                return User(shrimps, pellets, selected_pellet, money)
-        else:
-            # if there is no user, create a user with a crs in the shrimps state
-            crs = [CRS(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 0, 0), CRS(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, 0, 0)]
-            pellets = Algae_Wafer(0,0) # Starting food is algae wafer
-            new_user = User(crs, [pellets], 'Algae_Wafer', 100, 1)
+        if user_data is not False:
+            new_user = User(user_data.pellets, user_data.selected_pellet, user_data.money, user_data.id, user_data.shrimps)
+            print("Loading existing user: ", new_user.id ,new_user.name)
             return new_user
-    except EOFError as e:
-        print(f"EOFError: {e}. Possibly ran out of data in {filename}.")
+        else:
+            print("Current user not found, creating new user...")
+            # if there is no user, create a user with a crs in the shrimps state
+            crs = [CRS(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 0, 0), CRS(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 0, 0)]
+            d = {crs[0].id: crs[0], crs[1].id: crs[1]}
+            pellets = algae_wafer(0,0) # Starting food is algae wafer
+            new_user = User([pellets], 'algae_wafer', 100, 1)
+            new_user.shrimps['CRS'] = d
+            print("Created new user: ", new_user)
+            return new_user
 
+def new_user_load(filename):
+    print()
 # This function calls load_user_states asynchronously
 async def load_user_states_async(filename):
     loop = asyncio.get_event_loop()
@@ -65,10 +44,16 @@ async def save_user_states_async(user:User, filename):
     loop = asyncio.get_event_loop()
     await loop.run_in_executor(None, user.save_data, filename)
 
+
+
 async def main():
     # First we set up variables and load in user_states into current_user
     current_user = await load_user_states_async(save_file)
-    shrimps_on_screen = current_user.shrimps
+    # shrimps_on_screen = current_user.shrimps.items()
+    # for key, value in current_user.shrimps.items():
+        
+
+    #     print(f'{key}: {value}')
     pellets_on_screen = []
 
     # Start the game
@@ -84,8 +69,8 @@ async def main():
             # This is how we handle dropping the pellets
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 x, y = pygame.mouse.get_pos()
-                if current_user.selected_pellet == 'Algae_Wafer':
-                    pellets_on_screen.append(Algae_Wafer(x,y))
+                if current_user.selected_pellet == 'algae_wafer':
+                    pellets_on_screen.append(algae_wafer(x,y))
                 else:
                     print("ADD SOME DAMN PELLETS TO THE GAME")
 
@@ -102,9 +87,10 @@ async def main():
                     pellet.fall(SCREEN_HEIGHT)
                     pellet.draw(screen)
                 
-        for shrimp in shrimps_on_screen:
-            shrimp.move(SCREEN_WIDTH, SCREEN_HEIGHT)
-            shrimp.draw(screen)
+        for species, shrimps in current_user.shrimps.items():
+            for id, shrimp in shrimps.items():
+                shrimp.move(SCREEN_WIDTH, SCREEN_HEIGHT)
+                shrimp.draw(screen)
 
         # Update screen
         pygame.display.flip()
