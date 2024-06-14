@@ -18,4 +18,4 @@ These are just some examples of what you will be able to do. Here is a chart to 
 
 # Setup & Dependencies
 I am using Python with Pygame to create this game.  
-Pickle is being used to store user data and save-states 
+Pickle is being used to store user data and save-states.
