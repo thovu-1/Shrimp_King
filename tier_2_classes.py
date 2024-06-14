@@ -1,9 +1,13 @@
 from tier_1_classes import *
 
+# ---------------------------------------------------------------- Shrimp Species Classification -------------------------------- #####
+
 class CRS(Shrimp):
     def __init__(self, x, y, level, food_bar, image_path='shrimp_images/CRS.png'):
         super().__init__(x, y, level, food_bar, 'CRS', DIRECTION, image_path)
 
+
+# ---------------------------------------------------------------- Food Type Classification ------------------------------------- #####
 # Algae wafer is the lowest grade food. It provides 1 satiation.
 class algae_wafer(Pellet):
     def __init__(self, x, y, image_path='food_images/algae_wafer.png', half_life=10000):

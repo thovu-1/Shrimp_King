@@ -6,13 +6,14 @@ import atexit
 import random
 import os
 from enum import Enum
-# Function will be used for all shrimp classes to get shrimp size which changes depending on their level.
 import pygame
+
 # Defining Global Variables and setting up the display
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 DEFAULT_SPAWN_X = SCREEN_WIDTH // 2
 DEFAULT_SPAWN_Y = SCREEN_HEIGHT // 2
+SAVE_FILE = 'save_files/user_data.pkl'
 
 class DIRECTION(Enum):
     RIGHT = "right"
@@ -20,6 +21,7 @@ class DIRECTION(Enum):
     UP = "up"
     DOWN = "down"
 
+# Helper function to grow the shrimp
 def get_shrimp_size(image_path, level):
     shrimp_image = pygame.image.load(image_path)
     shrimp_image_height = shrimp_image.get_height()
@@ -33,4 +35,5 @@ def get_shrimp_size(image_path, level):
         return pygame.transform.scale(pygame.image.load(image_path), JUVENILE__SIZE)
     else:
         return pygame.transform.scale(pygame.image.load(image_path), SHRIMPLET_SIZE)
+
 

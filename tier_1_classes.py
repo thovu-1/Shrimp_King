@@ -5,7 +5,6 @@ import random
 from dotenv import load_dotenv
 import os
 from funcs import *
-from shrimp_funcs import *
 
 # Shrimps is a dictionary of a dictionary structured as {'CRS': {id:shrimp, id:shrimp}, 'OEBT': {id:shrimp,...}, ...}
 class User:
@@ -178,7 +177,9 @@ class Pellet:
         if self.rect.y < 0 or self.rect.y + 25 > screen_height - self.rect.height:
             self.falling = False   
 
+# ----------------------------------------------------------------FUNCTIONS ---------------------------------------------------------------- #
 
+# Helper function to unpickle all saved pellets
 def get_state_pellets(state):
     pellets = []
 
@@ -192,6 +193,7 @@ def get_state_pellets(state):
     return pellets
          
 
+# Helper function to unpickle all saved shrimps
 def get_state_shrimps(state):
     shrimps = {}
 
@@ -206,3 +208,43 @@ def get_state_shrimps(state):
             case _:
                 print("ADD OTHER SHRIMPS WHEN LOADING USER STATES")
     return shrimps
+
+# Function to create a new user
+def create_new_user():
+    print("Current user not found, creating new user...")
+    # if there is no user, create a user with a crs in the shrimps state
+
+    crs = [Shrimp(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 0, 0, 'CRS', DIRECTION, 'shrimp_images/CRS.png'), Shrimp(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 0, 0, 'CRS', DIRECTION, 'shrimp_images/CRS.png')]
+    d = {crs[0].id: crs[0], crs[1].id: crs[1]}
+    pellets = Pellet(0,0,'food_images/algae_wafer.png', 'algae_wafer', 10000)
+    new_user = User([pellets], 'algae_wafer', 100, 1)
+    new_user.shrimps['CRS'] = d
+    print("Created new user: ", new_user)
+    return new_user
+# Function to load an existing user using the load_data function in User class
+def load_existing_user(filename):
+    user_data = User.load_data(filename) # returns true or false
+
+    if user_data is not False:
+        new_user = User(user_data.pellets, user_data.selected_pellet, user_data.money, user_data.id, user_data.shrimps)
+        print("Loading existing user: ", new_user.id ,new_user.name)
+        return new_user
+    return user_data
+
+# This function calls load_user_states asynchronously
+async def load_user_states_async(filename):
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, load_user_states, filename)
+
+# This function saves the user_states asynchronuously
+async def save_user_states_async(user:User, filename):
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, user.save_data, filename)
+
+# This function will 'unpickle' the data from the user save file.
+def load_user_states(filename): 
+        existing_user = load_existing_user(filename)
+        if existing_user:
+            return existing_user
+        else:
+            return create_new_user()
