@@ -6,6 +6,8 @@ pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Shrimp King')
 
+
+
 async def main():
     # First we set up variables and load in user_states into current_user
     current_user = await load_user_states_async(SAVE_FILE)

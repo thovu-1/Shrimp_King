@@ -80,25 +80,38 @@ class User:
 
 class Shrimp:
     next_id = 1
-    def __init__(self, x, y, level, food_bar, species, direction: DIRECTION, image_path, x_vel=1, y_vel=1, id=None):
+    def __init__(self, x, y, level, food_bar, species, direction: DIRECTION, x_vel=1, y_vel=1, id=None):
         if id is not None:
             self.id = id
         else:
             self.id = Shrimp.next_id
             Shrimp.next_id += 1
+        
         self.species = species
         self.level = level
         self.food_bar = food_bar
-        self.image_path = image_path
-        self.image = get_shrimp_size(self.image_path, self.level)
-        self.rect = self.image.get_rect(x=x,y=y)
+        self.sprite_data = load_sprites()[self.level]  # Load sprites based on level
+        self.sprite_sheet = self.sprite_data['sprite_sheet']
+        self.frame_rects = self.sprite_data['frame_rects']
+        # self.image = get_shrimp_size(self.image_path, self.level)
+        # self.rect = self.image.get_rect(x=x,y=y)
+        self.direction = random.choice(list(DIRECTION))
+        self.wandering = True
+        self.scavenging = False
+        self.current_frame_index = 0
+        self.animation_speed = 0.2  # Adjust animation speed as needed
+        self.last_update_time = pygame.time.get_ticks()
+
+        # Determine rect dimensions based on first frame rect
+        first_frame_rect = self.frame_rects[0]  # Assuming frames are consistent in size
+        self.rect = pygame.Rect(x, y, first_frame_rect.width, first_frame_rect.height)
         self.rect.x = x
         self.rect.y = y
         self.x_vel = x_vel
         self.y_vel = y_vel
-        self.direction = random.choice(list(DIRECTION))
-        self.wandering = True
-        self.scavenging = False
+
+        print(self.level)
+        
     # Make an accelleration function that sends the shrimp in a certain direction, - the acceleration each tick until it 
     # stops and then change direction.If collision then change direction early
     def get_state(self):
@@ -116,15 +129,13 @@ class Shrimp:
         
 
     def move(self, screen_width, screen_height, pellets=None):
-        
+
         if self.wandering:
                 # 5% chance to change direction randomly.
-
                 num = random.randint(0,1000)
-
                 if num <= 5:
                     Shrimp.change_direction(self)
-                    print("Changing direction: ", self.direction)
+                    # print("Changing direction: ", self.direction)
 
                 match self.direction:
                     case DIRECTION.UP:
@@ -147,10 +158,28 @@ class Shrimp:
                     case DIRECTION.DOWN_LEFT:
                         self.rect.x += self.x_vel
                         self.rect.y -= self.y_vel
-                    
+                # Update animation frame based on movement
+
+                self.update_animation_frame()
 
         Shrimp.check_boundaries(self, screen_width, screen_height)
-        # print('Moving in direction: ', self.direction)
+    
+    def update_animation_frame(self):
+        # Update animation frame index
+        now = pygame.time.get_ticks()
+        elapsed_time = now - self.last_update_time
+
+        if elapsed_time > 1000 * self.animation_speed:  # Convert animation speed to milliseconds
+            self.last_update_time = now
+
+            # Determine frame index based on wandering state
+            if self.wandering:
+                # Switch between swimming frames (2-4)
+                self.current_frame_index = (self.current_frame_index % 3) + 2  # Cycle through frames 2, 3, 4
+            else:
+                # Idle frame (frame 1)
+                self.current_frame_index = 1
+
     def check_boundaries(self, screen_width, screen_height):
         # If i colide left, i should go the other way but i n
         if self.rect.x < 0:
@@ -197,7 +226,8 @@ class Shrimp:
             
     def draw(self, screen):
         # Draw CRS onto the screen
-        screen.blit(self.image, self.rect)
+        frame_rect = self.frame_rects[self.current_frame_index]
+        screen.blit(self.sprite_sheet, self.rect, frame_rect)
 
 # Pellet class represents food that we feed our shrimp.
 class Pellet:
@@ -255,7 +285,7 @@ def get_state_shrimps(state):
     for id, shrimp in state.items():
         match shrimp['species']:
             case 'CRS':
-                new_shrimp = Shrimp(DEFAULT_SPAWN_X,DEFAULT_SPAWN_Y, shrimp['level'], shrimp['food_bar'], shrimp['species'], DIRECTION, 'shrimp_images/First_Crystal_Red1.png', id=shrimp['id'])
+                new_shrimp = Shrimp(DEFAULT_SPAWN_X,DEFAULT_SPAWN_Y, shrimp['level'], shrimp['food_bar'], shrimp['species'], DIRECTION, id=shrimp['id'])
                 if 'CRS' in shrimps:
                     shrimps['CRS'].update({new_shrimp.id: new_shrimp})
                 else:
@@ -269,8 +299,10 @@ def create_new_user():
     print("Current user not found, creating new user...")
     # if there is no user, create a user with a crs in the shrimps state
 
-    crs = [Shrimp(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 0, 0, 'CRS', DIRECTION, 'shrimp_images/CRS.png'), Shrimp(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 0, 0, 'CRS', DIRECTION, 'shrimp_images/CRS.png')]
-    d = {crs[0].id: crs[0], crs[1].id: crs[1]}
+    crs = [Shrimp(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0, 'CRS', DIRECTION ), \
+           Shrimp(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 2, 0, 'CRS', DIRECTION ), \
+            Shrimp(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 3, 0, 'CRS', DIRECTION)]
+    d = {crs[0].id: crs[0], crs[1].id: crs[1], crs[2].id: crs[2]}
     pellets = Pellet(0,0,'food_images/algae_wafer.png', 'algae_wafer', 10000)
     new_user = User([pellets], 'algae_wafer', 100, 1)
     new_user.shrimps['CRS'] = d

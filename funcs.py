@@ -7,7 +7,7 @@ import random
 import os
 from enum import Enum
 import pygame
-
+import json
 # Defining Global Variables and setting up the display
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
@@ -55,6 +55,35 @@ def movement(shrimps, pellets):
         for species, shrimps in shrimps.items():
                 for id, shrimp in shrimps.items():
                     shrimp.move(SCREEN_WIDTH, SCREEN_HEIGHT, None)
-                
 
+def load_sprites():
+    d = {}
+    # Load sprite sheets
+    shrimplet_sprite_sheet = pygame.image.load('shrimp_images/Shrimplet_Crystal_Red.png').convert_alpha()
+    juvenile_sprite_sheet = pygame.image.load('shrimp_images/Juvenile_Crystal_Red.png').convert_alpha()
+    adult_sprite_sheet = pygame.image.load('shrimp_images/Adult_Crystal_Red.png').convert_alpha()
+
+    # Load frame data from JSON files
+    with open('shrimp_images/Shrimplet_Crystal_Red.json') as f:
+        shrimplet_data = json.load(f)
+    with open('shrimp_images/Juvenile_Crystal_Red.json') as f:
+        juvenile_data = json.load(f)
+    with open('shrimp_images/Adult_Crystal_Red.json') as f:
+        adult_data = json.load(f)
+
+    # Extract frame rectangles from JSON data
+    shrimplet_rects = [pygame.Rect(frame['frame']['x'], frame['frame']['y'], frame['frame']['w'], frame['frame']['h']) for frame in shrimplet_data['frames'].values()]
+    juvenile_rects = [pygame.Rect(frame['frame']['x'], frame['frame']['y'], frame['frame']['w'], frame['frame']['h']) for frame in juvenile_data['frames'].values()]
+    adult_rects = [pygame.Rect(frame['frame']['x'], frame['frame']['y'], frame['frame']['w'], frame['frame']['h']) for frame in adult_data['frames'].values()]
+
+    # Store sprite data in dictionary
+    d[1] = {'sprite_sheet': shrimplet_sprite_sheet, 'frame_rects': shrimplet_rects}
+    d[2] = {'sprite_sheet': juvenile_sprite_sheet, 'frame_rects': juvenile_rects}
+    d[3] = {'sprite_sheet': adult_sprite_sheet, 'frame_rects': adult_rects}
+
+    return d
+
+async def load_sprites_async():
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, load_sprites)
 
