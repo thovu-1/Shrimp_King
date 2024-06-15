@@ -1,4 +1,5 @@
 
+import math
 import pygame
 import pickle
 import random
@@ -39,7 +40,7 @@ class User:
             match shrimp.species:
                 case 'CRS':
                     self.money += shrimp.level * 1
-                
+
     def __getstate__(self):
         state = {
             'id': self.id,
@@ -96,7 +97,10 @@ class Shrimp:
         self.x_vel = x_vel
         self.y_vel = y_vel
         self.direction = random.choice(list(DIRECTION))
-
+        self.wandering = True
+        self.scavenging = False
+    # Make an accelleration function that sends the shrimp in a certain direction, - the acceleration each tick until it 
+    # stops and then change direction.If collision then change direction early
     def get_state(self):
         return {
                 'id': self.id,
@@ -111,38 +115,89 @@ class Shrimp:
         self.food_bar = state['food_bar']
         
 
-    def move(self, screen_width, screen_height):
+    def move(self, screen_width, screen_height, pellets=None):
+        
+        if self.wandering:
+                # 5% chance to change direction randomly.
 
-        # match self.direction:
-        #     case 
-        # Update CRS position
-        self.rect.x -= self.x_vel
-        self.rect.y -= self.y_vel
+                num = random.randint(0,1000)
 
-        # Add random variation to velocity for more natural movement
-        self.rect.x += random.randint(-1, 1)
-        self.rect.y += random.randint(-1, 1)
-        # Check boundaries and bounce if necessary
-        if self.rect.x < 0 or self.rect.x > screen_width - self.rect.width:
-            self.x_vel = -self.x_vel
-            self.image = pygame.transform.flip(self.image, True, False)
-        if self.rect.y < 0 or self.rect.y > screen_height - self.rect.height:
-            self.y_vel = -self.y_vel
+                if num <= 5:
+                    Shrimp.change_direction(self)
+                    print("Changing direction: ", self.direction)
 
-    def draw(self, screen):
-        # Draw CRS onto the screen
-        screen.blit(self.image, self.rect)
+                match self.direction:
+                    case DIRECTION.UP:
+                        self.rect.y -= self.y_vel
+                    case DIRECTION.DOWN:
+                        self.rect.y += self.y_vel
+                    case DIRECTION.LEFT:
+                        self.rect.x -= self.x_vel
+                    case DIRECTION.RIGHT:
+                        self.rect.x += self.x_vel
+                    case DIRECTION.UP_RIGHT:
+                        self.rect.x += self.x_vel
+                        self.rect.y -= self.y_vel
+                    case DIRECTION.UP_LEFT:
+                        self.rect.x -= self.x_vel
+                        self.rect.y -= self.y_vel
+                    case DIRECTION.DOWN_RIGHT:
+                        self.rect.x -= self.x_vel
+                        self.rect.y += self.y_vel
+                    case DIRECTION.DOWN_LEFT:
+                        self.rect.x += self.x_vel
+                        self.rect.y -= self.y_vel
+                    
+
+        Shrimp.check_boundaries(self, screen_width, screen_height)
+        # print('Moving in direction: ', self.direction)
+    def check_boundaries(self, screen_width, screen_height):
+        # If i colide left, i should go the other way but i n
+        if self.rect.x < 0:
+            self.direction = DIRECTION.RIGHT 
+        if self.rect.x >= screen_width - self.rect.width + 10: 
+            self.direction = DIRECTION.LEFT
+        if self.rect.y < 0:
+            self.direction = DIRECTION.DOWN
+        if self.rect.y >= screen_height - self.rect.height + 10:
+            self.direction = DIRECTION.UP
+            
+            # Shrimp.change_direction(self)    
+    def change_direction(self):
+        self.direction = random.choice(list(DIRECTION))
     
     def find_pellet(self, pellets):
         # Find pellet closest to CRS
         closest_pellet = None
-        for pellet in pellets:
-            if closest_pellet is None:
-                closest_pellet = pellet
-            elif self.rect.x - pellet.rect.x < self.rect.x - closest_pellet.rect.x:
-                closest_pellet = pellet
-        return closest_pellet
+        if pellets is not None:
+            for pellet in pellets:
+                if closest_pellet is None:
+                    closest_pellet = pellet
+                elif self.rect.x - pellet.rect.x < self.rect.x - closest_pellet.rect.x:
+                    closest_pellet = pellet
+            # Calculate direction vector towards closest pellet
+            direction_x = closest_pellet.rect.x - self.rect.x
+            direction_y = closest_pellet.rect.y - self.rect.y
+             # Calculate distance to pellet (optional, for further use)
+            distance = math.hypot(direction_x, direction_y)
 
+             # Normalize direction vector (convert to unit vector)
+            if distance != 0:
+                print(direction_x, direction_y)
+                direction_x /= distance
+                direction_y /= distance
+                
+
+            # Update shrimp position based on velocity
+            # Need to move towards direction_x and direction_y
+
+            self.rect.x += self.x_vel
+            self.rect.y += self.y_vel
+
+            
+    def draw(self, screen):
+        # Draw CRS onto the screen
+        screen.blit(self.image, self.rect)
 
 # Pellet class represents food that we feed our shrimp.
 class Pellet:
@@ -200,7 +255,7 @@ def get_state_shrimps(state):
     for id, shrimp in state.items():
         match shrimp['species']:
             case 'CRS':
-                new_shrimp = Shrimp(DEFAULT_SPAWN_X,DEFAULT_SPAWN_Y, shrimp['level'], shrimp['food_bar'], shrimp['species'], DIRECTION, 'shrimp_images/CRS.png', id=shrimp['id'])
+                new_shrimp = Shrimp(DEFAULT_SPAWN_X,DEFAULT_SPAWN_Y, shrimp['level'], shrimp['food_bar'], shrimp['species'], DIRECTION, 'shrimp_images/First_Crystal_Red1.png', id=shrimp['id'])
                 if 'CRS' in shrimps:
                     shrimps['CRS'].update({new_shrimp.id: new_shrimp})
                 else:

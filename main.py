@@ -9,6 +9,7 @@ pygame.display.set_caption('Shrimp King')
 async def main():
     # First we set up variables and load in user_states into current_user
     current_user = await load_user_states_async(SAVE_FILE)
+    shrimps = current_user.shrimps
     pellets_on_screen = []
 
     # Start the game
@@ -41,16 +42,16 @@ async def main():
                 else:
                     pellet.fall(SCREEN_HEIGHT)
                     pellet.draw(screen)
-                
+
         for species, shrimps in current_user.shrimps.items():
             for id, shrimp in shrimps.items():
-                shrimp.move(SCREEN_WIDTH, SCREEN_HEIGHT)
+                shrimp.move(SCREEN_WIDTH, SCREEN_HEIGHT, pellets_on_screen if len(pellets_on_screen) > 0 else None)
                 shrimp.draw(screen)
 
         # Update screen
         pygame.display.flip()
         # Control frame rate
-        pygame.time.Clock().tick(60)  
+        pygame.time.Clock().tick(30)  
 
 if __name__ == "__main__":
     asyncio.run(main())

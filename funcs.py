@@ -20,6 +20,10 @@ class DIRECTION(Enum):
     LEFT = "left"
     UP = "up"
     DOWN = "down"
+    UP_LEFT = "up-left"
+    UP_RIGHT = "up-right"
+    DOWN_LEFT = "down-left"
+    DOWN_RIGHT = "down-right"
 
 # Helper function to grow the shrimp
 def get_shrimp_size(image_path, level):
@@ -35,5 +39,22 @@ def get_shrimp_size(image_path, level):
         return pygame.transform.scale(pygame.image.load(image_path), JUVENILE__SIZE)
     else:
         return pygame.transform.scale(pygame.image.load(image_path), SHRIMPLET_SIZE)
+
+def movement(shrimps, pellets):
+    if len(pellets) > 0:
+            for pellet in pellets:
+                pellet.check_half_life()
+                if pellet.expired:
+                    pellets.remove(pellet)
+                else:
+                    pellet.fall(SCREEN_HEIGHT)
+            for species, shrimps in shrimps.items():
+                for id, shrimp in shrimps.items():
+                    shrimp.move(SCREEN_WIDTH, SCREEN_HEIGHT, pellets)
+    else:
+        for species, shrimps in shrimps.items():
+                for id, shrimp in shrimps.items():
+                    shrimp.move(SCREEN_WIDTH, SCREEN_HEIGHT, None)
+                
 
 
