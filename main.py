@@ -1,6 +1,6 @@
 from tier_1_classes import *
 from tier_2_classes import *
-from funcs import *
+from funcs_and_variables import *
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
