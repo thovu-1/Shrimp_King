@@ -14,7 +14,8 @@ SCREEN_HEIGHT = 720
 DEFAULT_SPAWN_X = SCREEN_WIDTH // 2
 DEFAULT_SPAWN_Y = SCREEN_HEIGHT // 2
 SAVE_FILE = 'save_files/user_data.pkl'
-
+BOTTOM_LAYER_TOP = 650
+BOTTOM_LAYER_BOTTOM = 710
 class DIRECTION(Enum):
     RIGHT = "right"
     LEFT = "left"
@@ -40,21 +41,6 @@ def get_shrimp_size(image_path, level):
     else:
         return pygame.transform.scale(pygame.image.load(image_path), SHRIMPLET_SIZE)
 
-def movement(shrimps, pellets):
-    if len(pellets) > 0:
-            for pellet in pellets:
-                pellet.check_half_life()
-                if pellet.expired:
-                    pellets.remove(pellet)
-                else:
-                    pellet.fall(SCREEN_HEIGHT)
-            for species, shrimps in shrimps.items():
-                for id, shrimp in shrimps.items():
-                    shrimp.move(SCREEN_WIDTH, SCREEN_HEIGHT, pellets)
-    else:
-        for species, shrimps in shrimps.items():
-                for id, shrimp in shrimps.items():
-                    shrimp.move(SCREEN_WIDTH, SCREEN_HEIGHT, None)
 
 def load_sprites():
     d = {}
@@ -72,10 +58,9 @@ def load_sprites():
         adult_data = json.load(f)
 
     # Extract frame rectangles from JSON data
-    shrimplet_rects = [pygame.Rect(frame['frame']['x'], frame['frame']['y'], frame['frame']['w'], frame['frame']['h']) for frame in shrimplet_data['frames'].values()]
-    juvenile_rects = [pygame.Rect(frame['frame']['x'], frame['frame']['y'], frame['frame']['w'], frame['frame']['h']) for frame in juvenile_data['frames'].values()]
-    adult_rects = [pygame.Rect(frame['frame']['x'], frame['frame']['y'], frame['frame']['w'], frame['frame']['h']) for frame in adult_data['frames'].values()]
-
+    shrimplet_rects = [pygame.Rect(frame['frame']['x'], frame['frame']['y']+6, frame['frame']['w'], frame['frame']['h']-15) for frame in shrimplet_data['frames'].values()]
+    juvenile_rects = [pygame.Rect(frame['frame']['x'], frame['frame']['y']+15, frame['frame']['w'], frame['frame']['h']-35) for frame in juvenile_data['frames'].values()]
+    adult_rects = [pygame.Rect(frame['frame']['x'], frame['frame']['y']+30, frame['frame']['w'], frame['frame']['h']-70) for frame in adult_data['frames'].values()]
     # Store sprite data in dictionary
     d[1] = {'sprite_sheet': shrimplet_sprite_sheet, 'frame_rects': shrimplet_rects}
     d[2] = {'sprite_sheet': juvenile_sprite_sheet, 'frame_rects': juvenile_rects}

@@ -1,4 +1,4 @@
-from tier_1_classes import *
+from classes.shrimp_class import *
 
 # ---------------------------------------------------------------- Shrimp Species Classification -------------------------------- #####
 
