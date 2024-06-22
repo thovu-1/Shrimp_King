@@ -46,7 +46,7 @@ class Pellet:
         for type, pellet in state.items():
             match pellet:
                 case 'algae_wafer':
-                    pellet = Pellet(0,0,'food_images/algae_wafer.png', 'algae_wafer', 10000)
+                    pellet = Pellet(0,0,'classes/food/food_images/algae_wafer.png', 'algae_wafer', 10000)
                     pellet_list.append(pellet)
                 case _:
                     print("ADD OTHER PELLETS WHEN LOADING USER STATES")

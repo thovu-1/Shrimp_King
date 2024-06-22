@@ -48,9 +48,10 @@ def load_user_shrimps(user):
     for species, shrimp_dicts in user.shrimps.items():
         for id, shrimp in shrimp_dicts.items():
             if species in shrimp_id_dict:
-                shrimp_id_dict[species].update(id)
+                # print("Updating species ")
+                shrimp_id_dict[species].append(id)
             else:
-                shrimp_id_dict[species] = id
+                shrimp_id_dict[species] = [id]
     return shrimp_id_dict
 
 def handle_shrimp_scavenging(pellets_on_screen, pellet_index, current_shrimp):

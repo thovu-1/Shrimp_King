@@ -1,13 +1,11 @@
-import sys
 import math
 import pygame
 import pickle
 import random
 from dotenv import load_dotenv
 import os
-sys.path.append('../../')
-from Models.funcs_and_variables import *
 from classes.food.pellet_class import *
+from Models.funcs_and_variables import *
 
 class Shrimp:
     next_id = 1
@@ -28,11 +26,16 @@ class Shrimp:
         self.animation_speed = 0.2  # Adjust animation speed as needed
         self.last_update_time = pygame.time.get_ticks()
         self.idle_timer = self.last_update_time
+        self.idle_time = random.randint(20000,25000)
         self.boost_clock = self.last_update_time
         self.eatting_timer = self.last_update_time
         self.direction_change_cooldown = self.last_update_time
+        self.direction_change_time = random.randint(1000,3000)
         self.cruising_bottom_timer = self.last_update_time
+        self.cruising_bottom_time = random.randint(2500,5000)
         self.cruising_top_timer = self.last_update_time
+        self.cruising_top_time = random.randint(2500,5000)
+        self.scavenge_direction_change_time = random.randint(500,1000)
         self.max_speed = 5
         self.drag = 0.02
         self.min_speed = 1
@@ -79,7 +82,7 @@ class Shrimp:
             elif self.wandering and not self.out_of_bounds:
                 now = pygame.time.get_ticks()
                 # stop for 2500
-                if now - self.idle_timer < 2500:
+                if now - self.idle_timer < self.direction_change_time:
                     self.idling = True
                     self.x_vel = 0
                     self.y_vel = 0
@@ -91,9 +94,11 @@ class Shrimp:
                 else: 
                     self.cruising_top_layer()
                     self.move_in_direction()
-                if now - self.idle_timer > 20000:
+                if now - self.idle_timer > self.idle_time:
                     self.idling = False
                     self.idle_timer = pygame.time.get_ticks()
+                    self.direction_change_time = random.randint(2500,5000)
+                    self.idle_time = random.randint(20000,25000)
                     self.x_vel = 0
                     self.y_vel = 0
 
@@ -115,7 +120,7 @@ class Shrimp:
         # Convert angle to one of the 8 cardinal or diagonal directions
         now = pygame.time.get_ticks()
         direction = self.direction
-        if now - self.direction_change_cooldown > 500:
+        if now - self.direction_change_cooldown > self.scavenge_direction_change_time:
             if math.pi/8 <= angle <= 3*math.pi/8:
                 direction = DIRECTION.DOWN_RIGHT
             elif 3*math.pi/8 < angle <= 5*math.pi/8:
@@ -134,6 +139,7 @@ class Shrimp:
                 direction = DIRECTION.LEFT
         
             self.direction_change_cooldown = pygame.time.get_ticks()
+            self.scavenge_direction_change_time = random.randint(500,1000)
 
         self.direction = direction
     # Move in self.direction
@@ -176,16 +182,16 @@ class Shrimp:
             print("Applying Drag")
             self.x_vel *= self.drag
             self.y_vel *= self.drag
-    def hang_around(self):
-        now = pygame.time.get_ticks()
-        elapsed_time = now - self.idle_timer
-        num = random.randint(1000,15000)
-        if elapsed_time > num:
-            self.idle_timer = pygame.time.get_ticks()
-            self.direction = random.choice(list(DIRECTION))
-            self.x_vel = 0
-            self.y_vel = 0
-            self.boosto_boosto(math.pi/2)
+    # def hang_around(self):
+    #     now = pygame.time.get_ticks()
+    #     elapsed_time = now - self.idle_timer
+    #     num = random.randint(1000,15000)
+    #     if elapsed_time > num:
+    #         self.idle_timer = pygame.time.get_ticks()
+    #         self.direction = random.choice(list(DIRECTION))
+    #         self.x_vel = 0
+    #         self.y_vel = 0
+    #         self.boosto_boosto(math.pi/2)
     # Updating our animation for the shrimp. 0=idle 1-3=swimming 4-6=eatting 
     def update_animation_frame(self):
         # Update animation frame index
@@ -222,23 +228,25 @@ class Shrimp:
         num = random.randint(0,10)
         current_time = pygame.time.get_ticks()
         # 0.005 % chance to leave bottom layer
-        if current_time - self.cruising_bottom_timer > 2500:
+        if current_time - self.cruising_bottom_timer > self.cruising_bottom_time:
             if num > 8:
                 self.direction = random.choice([DIRECTION.UP, DIRECTION.UP_RIGHT,DIRECTION.UP_LEFT])
             else:
                 self.direction = random.choice([DIRECTION.LEFT, DIRECTION.RIGHT])
             self.cruising_bottom_timer = current_time
+            self.cruising_bottom_time = random.randint(2500,5000)
     
     def cruising_top_layer(self):
         num = random.randint(0,10)
         current_time = pygame.time.get_ticks()
         # 0.005 % chance to leave bottom layer
-        if current_time - self.cruising_top_timer > 2500:
+        if current_time - self.cruising_top_timer > self.cruising_top_time:
             if num > 8:
                 self.direction = random.choice([DIRECTION.UP, DIRECTION.UP_LEFT, DIRECTION.UP_RIGHT])
             else:
                 self.direction = random.choice([DIRECTION.DOWN, DIRECTION.DOWN_RIGHT,DIRECTION.DOWN_LEFT, DIRECTION.LEFT, DIRECTION.RIGHT])
             self.cruising_top_timer = current_time
+            self.cruising_top_time = random.randint(2500,5000)
 
         
         
@@ -259,6 +267,7 @@ class Shrimp:
             print("Should be moving up")
             print("direction: ", self.direction)
             print('x,y', self.x_vel, self.y_vel)
+            self.x_vel = self.y_vel = 1
             self.direction = DIRECTION.UP
             self.out_of_bounds = True
         else:
@@ -270,6 +279,7 @@ class Shrimp:
     # Function loops through pellets if they exist otherwise it sets wandering to True
     # Will update the closet pellet x,y pos if there is a pellet.
     def find_pellet_x_y(self, pellets):
+        # Find pellet closest to Crystal_Red
         temp_pellet = None
         if pellets is not None and len(pellets) > 0:
             for pellet in pellets:
@@ -291,12 +301,16 @@ class Shrimp:
         frame_rect = self.frame_rects[self.current_frame_index]
         image = self.sprite_sheet
 
-        if self.direction == DIRECTION.RIGHT :
+        if self.direction == DIRECTION.RIGHT or self.direction == DIRECTION.UP_RIGHT or self.direction == DIRECTION.DOWN_RIGHT:
                 image = pygame.transform.flip(self.sprite_sheet, True, False)
-        elif self.direction == DIRECTION.LEFT:
+        elif self.direction == DIRECTION.LEFT or self.direction == DIRECTION.UP_LEFT or self.direction == DIRECTION.DOWN_LEFT:
                 image = pygame.transform.flip(self.sprite_sheet, False, False)
 
         screen.blit(image, self.rect, frame_rect)
+
+    def load_sprites(self):
+        # For overloading
+        print("Load_Sprites in shrimp_class")
 
     def to_string(self):
         print('Species:', self.species, 'Level:', self.level, 'Food_bar', self.food_bar, 'Next_Level:', self.next_level)

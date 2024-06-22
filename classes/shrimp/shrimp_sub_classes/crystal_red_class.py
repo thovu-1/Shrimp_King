@@ -30,7 +30,7 @@ class Crystal_Red(Shrimp):
         elif self.level >= 3:
             self.next_level = self.level * 10
             self.passive_gold_generation = self.passive_gold_generation * 2
-        print("ID:", self.id, 'Level:', self.level, 'Gold_Generation:', self.passive_gold_generation)
+        #print("ID:", self.id, 'Level:', self.level, 'Gold_Generation:', self.passive_gold_generation)
 
     def level_up(self):
         self.level = self.level + 1
@@ -44,16 +44,16 @@ class Crystal_Red(Shrimp):
     def load_sprites(self):
         d = {}
         # Load sprite sheets
-        shrimplet_sprite_sheet = pygame.image.load('shrimp_images/Shrimplet_Crystal_Red.png').convert_alpha()
-        juvenile_sprite_sheet = pygame.image.load('shrimp_images/Juvenile_Crystal_Red.png').convert_alpha()
-        adult_sprite_sheet = pygame.image.load('shrimp_images/Adult_Crystal_Red.png').convert_alpha()
+        shrimplet_sprite_sheet = pygame.image.load('classes/shrimp/shrimp_images/Shrimplet_Crystal_Red.png').convert_alpha()
+        juvenile_sprite_sheet = pygame.image.load('classes/shrimp/shrimp_images/Juvenile_Crystal_Red.png').convert_alpha()
+        adult_sprite_sheet = pygame.image.load('classes/shrimp/shrimp_images/Adult_Crystal_Red.png').convert_alpha()
 
         # Load frame data from JSON files
-        with open('shrimp_images/Shrimplet_Crystal_Red.json') as f:
+        with open('classes/shrimp/shrimp_images/Shrimplet_Crystal_Red.json') as f:
             shrimplet_data = json.load(f)
-        with open('shrimp_images/Juvenile_Crystal_Red.json') as f:
+        with open('classes/shrimp/shrimp_images/Juvenile_Crystal_Red.json') as f:
             juvenile_data = json.load(f)
-        with open('shrimp_images/Adult_Crystal_Red.json') as f:
+        with open('classes/shrimp/shrimp_images/Adult_Crystal_Red.json') as f:
             adult_data = json.load(f)
 
         # Extract frame rectangles from JSON data

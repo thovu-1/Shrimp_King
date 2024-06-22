@@ -68,19 +68,19 @@ async def main():
                     pellet.fall(SCREEN_HEIGHT)
                     pellet.draw(screen)
 
-        for species, id in loaded_user_shrimp_ids.items():
-            current_shrimp = current_user.shrimps[species][id]
-            pellet_index = current_shrimp.rect.collidelist(pellets_on_screen)
+        for species, id_list in loaded_user_shrimp_ids.items():
+            for id in id_list: 
+                current_shrimp = current_user.shrimps[species][id]
+                pellet_index = current_shrimp.rect.collidelist(pellets_on_screen)
             # Keep track of current time for food eatting cooldowns
-    
-            handle_shrimp_scavenging(pellets_on_screen, pellet_index, current_shrimp)
-            gold_timer = pygame.time.get_ticks()
-            if gold_timer - gold_tick_buffer > 500:
-                current_user.get_gold(current_shrimp)
-                gold_tick_buffer = pygame.time.get_ticks()
-            current_shrimp.move(SCREEN_WIDTH, SCREEN_HEIGHT, pellets_on_screen if len(pellets_on_screen) > 0 else None)
-            screen.blit(minecraft_font.render('$ ' + str(current_user.gold), False, gold_color), (0,10))
-            current_shrimp.draw(screen)
+                handle_shrimp_scavenging(pellets_on_screen, pellet_index, current_shrimp)
+                gold_timer = pygame.time.get_ticks()
+                if gold_timer - gold_tick_buffer > 500:
+                    current_user.get_gold(current_shrimp)
+                    gold_tick_buffer = pygame.time.get_ticks()
+                current_shrimp.move(SCREEN_WIDTH, SCREEN_HEIGHT, pellets_on_screen if len(pellets_on_screen) > 0 else None)
+                screen.blit(minecraft_font.render('$ ' + str(current_user.gold), False, gold_color), (0,10))
+                current_shrimp.draw(screen)
         # Update screen
         pygame.display.flip()
         # Control frame rate

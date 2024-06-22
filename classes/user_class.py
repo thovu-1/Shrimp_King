@@ -30,12 +30,12 @@ class User:
 
     def add_shrimp(self, shrimp):
         if shrimp.species in self.shrimps:
-            print("Shrimp species exists:", shrimp.species)
-            self.shrimps[shrimp.species] = {shrimp.id: shrimp}
-            print("Dictionary after adding shrimp that exists:", self.shrimps)
+            # print("Shrimp species exists:", shrimp.species)
+            self.shrimps[shrimp.species].update({shrimp.id: shrimp})
+            # print("Dictionary after adding shrimp that exists:", self.shrimps)
         else:
             self.shrimps[shrimp.species] = {shrimp.id: shrimp}
-            print("Shrimp does not exist current shrimp dict:", self.shrimps)
+            # print("Shrimp does not exist current shrimp dict:", self.shrimps)
     def get_gold(self, current_shrimp):
         self.gold += current_shrimp.passive_gold_generation
 
@@ -44,22 +44,25 @@ class User:
             'id': self.id,
             'gold' : self.gold,
             'selected_pellet': self.selected_pellet}
-        shrimps = {}
+        shrimps_to_save = {}
         pellets = {}
         for pellet in self.pellets:
             pellets.update(pellet.get_state())
             #pellets.append(pellet.get_state())
-        print("PELLETS state[pellets]:", pellets)
+        #print("PELLETS state[pellets]:", pellets)
         state['pellets'] = pellets
-        print("Shrimps dict here", self.shrimps)
+        #print("Shrimps dict here", self.shrimps)
         if self.shrimps is not None:
             for species, shrimp_dict in self.shrimps.items():
                 for id, shrimp in shrimp_dict.items():
-                    if species in shrimps:
-                        shrimps[species].update(shrimp.get_state())
+                    if species in shrimps_to_save:
+                        #print("Shrimp species", shrimp.species, " exists ID:", id)
+                        print("Adding: ", shrimp.get_state(), "To state:", shrimps_to_save[species])
+                        shrimps_to_save[species].update(shrimp.get_state())
                     else:
-                        shrimps[species] = shrimp.get_state()
-        state['shrimps'] = shrimps
+                        shrimps_to_save[species] = shrimp.get_state()
+
+        state['shrimps'] = shrimps_to_save
         print('SAVING STATE: ', state)
         return state
     def __setstate__(self, state):
@@ -93,15 +96,24 @@ def create_new_user():
     #         Shrimp(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 3, 0, 'Crystal_Red', DIRECTION)]
     # d = {crs[0].id: crs[0], crs[1].id: crs[1], crs[2].id: crs[2]}
 
-    crs = [Crystal_Red(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0)]
-    shadow_panda = [Shadow_Panda(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0)]
-    crystal_black = [Crystal_Black(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0)]
-    pellet = Pellet(0,0,'food_images/algae_wafer.png', 'algae_wafer', 10000)
+    # crs = [Crystal_Red(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0)]
+    # shadow_panda = [Shadow_Panda(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0)]
+    # crystal_black = [Crystal_Black(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0)]
+    # pellet = Pellet(0,0,'classes/food/food_images/algae_wafer.png', 'algae_wafer', 10000)
+    # new_user = User([pellet], 'algae_wafer', 100, 1)
+    # new_user.shrimps['Crystal_Red'] = {crs[0].id: crs[0]}
+    # new_user.shrimps['Shadow_Panda'] = {shadow_panda[0].id: shadow_panda[0]}
+    # new_user.shrimps['Crystal_Black'] = {crystal_black[0].id: crystal_black[0]}
+    #print("Created new user: ", new_user)
+
+    pellet = Pellet(0,0,'classes/food/food_images/algae_wafer.png', 'algae_wafer', 10000)
     new_user = User([pellet], 'algae_wafer', 100, 1)
-    new_user.shrimps['Crystal_Red'] = {crs[0].id: crs[0]}
-    new_user.shrimps['Shadow_Panda'] = {shadow_panda[0].id: shadow_panda[0]}
-    new_user.shrimps['Crystal_Black'] = {crystal_black[0].id: crystal_black[0]}
-    print("Created new user: ", new_user)
+    for i in range(50):
+        new_user.add_shrimp(Crystal_Red(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0))
+        new_user.add_shrimp(Shadow_Panda(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0))
+        new_user.add_shrimp(Crystal_Black(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0))
+
+
     return new_user
 # Function to load an existing user using the load_data function in User class
 def load_existing_user(filename):
