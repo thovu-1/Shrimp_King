@@ -4,8 +4,8 @@ import pickle
 import random
 from dotenv import load_dotenv
 import os
-from funcs_and_variables import *
-from classes.pellet_class import *
+from Models.funcs_and_variables import *
+from classes.food.pellet_class import *
 
 
 class Shrimp:
@@ -20,7 +20,7 @@ class Shrimp:
         self.species = species
         self.level = level
         self.food_bar = food_bar
-
+        self.next_level =  0 
         # Attributes for movement modifiers 
         self.direction = random.choice(list(DIRECTION))
         self.current_frame_index = 0
@@ -37,7 +37,7 @@ class Shrimp:
         self.min_speed = 1
 
         # Attributes for sprite and location tracking
-        self.sprite_data = load_sprites()[self.level]  # Load sprites based on level
+        self.sprite_data = self.load_sprites()[self.species][max(0,min(self.level, 3))]  # Load sprites based on level
         self.sprite_sheet = self.sprite_data['sprite_sheet']
         self.frame_rects = self.sprite_data['frame_rects']
         self.first_frame_rect = self.frame_rects[0]  # Assuming frames are consistent in size
@@ -57,20 +57,6 @@ class Shrimp:
         self.boosting = False
         self.idling = False
         
-
-    # Functions for saving shrimp information
-    def get_state(self):
-        return {
-                'id': self.id,
-                'species': self.species,
-                'level': self.level,
-                'food_bar': self.food_bar,  
-                }
-    # Functions for loading shrimp information
-    def set_state(self, state):
-        # Set state from dictionary
-        self.level = state['level']
-        self.food_bar = state['food_bar']
         
     # Functions that will move and display the shrimp
     def move(self, screen_width, screen_height, pellets=None):
@@ -78,12 +64,10 @@ class Shrimp:
         self.check_boundaries(screen_width, screen_height)
         if self.out_of_bounds:
             self.move_in_direction()
-            print("Out of bounds")
         else:
             self.find_pellet_x_y(pellets)
              # If we havent hit a wall and there are pellets on the screen go towards to pellets
             if self.scavenging or self.eatting and not self.out_of_bounds:  
-                # print("Scavening or eatting")
                 # Find direction to go towards
                 self.scavenge(self.rect.x, self.rect.y, self.closest_pellet.rect.x, self.closest_pellet.rect.y)
                 # Only modifies speed
@@ -94,15 +78,13 @@ class Shrimp:
             elif self.wandering and not self.out_of_bounds:
                 now = pygame.time.get_ticks()
                 # stop for 2500
-                if now - self.idle_timer < 2500:
+                if now - self.idle_timer < random.randint(1000,3000):
                     self.idling = True
                     self.x_vel = 0
                     self.y_vel = 0
                 elif self.x_vel != self.min_speed or self.y_vel != self.min_speed and not self.idling:
                     self.slow_down() 
-                #print(self.rect.y, BOTTOM_LAYER_BOTTOM, BOTTOM_LAYER_TOP)
                 if self.rect.y <= BOTTOM_LAYER_BOTTOM and self.rect.y >= BOTTOM_LAYER_TOP:
-                    
                     self.cruise_bottom_layer() # Means we cannot move down in any direction
                     self.move_in_direction()
                 else: 
@@ -121,14 +103,8 @@ class Shrimp:
         # if they are idle, they should only be able to move left or right, and have the same fall functionality as the pellets
 
         self.update_animation_frame()
-         
-    def eat(self):
-        print("ID:", self.id, 'Level:', self.level, 'Food:', self.food_bar)
-        self.eatting = True
-        self.x_vel = 0
-        self.y_vel = 0
-        self.food_bar += 1
-
+    
+        
     # Using Bresenhams line drawing algorithm to find the shortest path between the shrimp and the closest pellet
     # Returns DIRECTION
     def scavenge(self, x, y, target_x, target_y):
@@ -138,7 +114,7 @@ class Shrimp:
         # Convert angle to one of the 8 cardinal or diagonal directions
         now = pygame.time.get_ticks()
         direction = self.direction
-        if now - self.direction_change_cooldown > 500:
+        if now - self.direction_change_cooldown > random.randint(250,750):
             if math.pi/8 <= angle <= 3*math.pi/8:
                 direction = DIRECTION.DOWN_RIGHT
             elif 3*math.pi/8 < angle <= 5*math.pi/8:
@@ -187,9 +163,9 @@ class Shrimp:
         # Cap the velocity to max speed
         if self.boosting:
             if self.x_vel < self.max_speed:
-                self.x_vel += 0.05
+                self.x_vel += 0.5
             if self.y_vel < self.max_speed:
-                self.y_vel += 0.05
+                self.y_vel += 0.5
     def slow_down(self):
         # Apply minimum speed threshold
         if self.x_vel < self.min_speed or self.y_vel < self.min_speed:
@@ -257,7 +233,6 @@ class Shrimp:
         current_time = pygame.time.get_ticks()
         # 0.005 % chance to leave bottom layer
         if current_time - self.cruising_top_timer > 2500:
-            print(num)
             if num > 8:
                 self.direction = random.choice([DIRECTION.UP, DIRECTION.UP_LEFT, DIRECTION.UP_RIGHT])
             else:
@@ -280,6 +255,9 @@ class Shrimp:
             self.direction = DIRECTION.DOWN
             self.out_of_bounds = True
         elif y >= screen_height - self.rect.height:
+            print("Should be moving up")
+            print("direction: ", self.direction)
+            print('x,y', self.x_vel, self.y_vel)
             self.direction = DIRECTION.UP
             self.out_of_bounds = True
         else:
@@ -291,7 +269,7 @@ class Shrimp:
     # Function loops through pellets if they exist otherwise it sets wandering to True
     # Will update the closet pellet x,y pos if there is a pellet.
     def find_pellet_x_y(self, pellets):
-        # Find pellet closest to CRS
+        # Find pellet closest to Crystal_Red
         temp_pellet = None
         if pellets is not None and len(pellets) > 0:
             for pellet in pellets:
@@ -318,7 +296,14 @@ class Shrimp:
         elif self.direction == DIRECTION.LEFT:
                 image = pygame.transform.flip(self.sprite_sheet, False, False)
 
-        screen.blit(image, self.rect, frame_rect)
+        screen.blit(image, self.rect, frame_rect, 2)
+
+    def load_sprites(self):
+        # For overloading
+        print("Load_Sprites in shrimp_class")
+
+    def to_string(self):
+        print('Species:', self.species, 'Level:', self.level, 'Food_bar', self.food_bar, 'Next_Level:', self.next_level)
 
 
 

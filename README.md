@@ -4,7 +4,7 @@ I keep shrimp as a hobby and I love idler games so I am really enjoying this pro
 
 # Project Description (Current Implementations) 
 You will start off with an aquarium with 1 shrimp, you can feed this shrimp until it grows up to become an adult. 
-For every shrimp you have, you will passively gain more money. The bigger the shrimp the more you earn.  
+For every shrimp you have, you will passively gain more gold. The bigger the shrimp the more you earn.  
 You will be able to purchase differnet types of shrimps from the store, or test your luck with lucky eggs that may contain rare shrimp.  
  
 # Future Updates

@@ -1,0 +1,83 @@
+{ "frames": {
+   "aquarium_background1 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 1280, "h": 720 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 1280, "h": 720 },
+    "sourceSize": { "w": 1280, "h": 720 },
+    "duration": 100
+   },
+   "aquarium_background1 1.aseprite": {
+    "frame": { "x": 1280, "y": 0, "w": 1280, "h": 720 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 1280, "h": 720 },
+    "sourceSize": { "w": 1280, "h": 720 },
+    "duration": 100
+   },
+   "aquarium_background1 2.aseprite": {
+    "frame": { "x": 2560, "y": 0, "w": 1280, "h": 720 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 1280, "h": 720 },
+    "sourceSize": { "w": 1280, "h": 720 },
+    "duration": 100
+   },
+   "aquarium_background1 3.aseprite": {
+    "frame": { "x": 3840, "y": 0, "w": 1280, "h": 720 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 1280, "h": 720 },
+    "sourceSize": { "w": 1280, "h": 720 },
+    "duration": 100
+   },
+   "aquarium_background1 4.aseprite": {
+    "frame": { "x": 5120, "y": 0, "w": 1280, "h": 720 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 1280, "h": 720 },
+    "sourceSize": { "w": 1280, "h": 720 },
+    "duration": 100
+   },
+   "aquarium_background1 5.aseprite": {
+    "frame": { "x": 6400, "y": 0, "w": 1280, "h": 720 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 1280, "h": 720 },
+    "sourceSize": { "w": 1280, "h": 720 },
+    "duration": 100
+   },
+   "aquarium_background1 6.aseprite": {
+    "frame": { "x": 7680, "y": 0, "w": 1280, "h": 720 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 1280, "h": 720 },
+    "sourceSize": { "w": 1280, "h": 720 },
+    "duration": 100
+   },
+   "aquarium_background1 7.aseprite": {
+    "frame": { "x": 8960, "y": 0, "w": 1280, "h": 720 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 1280, "h": 720 },
+    "sourceSize": { "w": 1280, "h": 720 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.7-x64",
+  "image": "aquarium_background1.png",
+  "format": "RGBA8888",
+  "size": { "w": 10240, "h": 720 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "shooting_star", "from": 1, "to": 7, "direction": "forward", "color": "#000000ff" }
+  ],
+  "layers": [
+   { "name": "Layer 0", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}
