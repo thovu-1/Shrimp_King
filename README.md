@@ -1,7 +1,7 @@
 # Shrimp King Game
 I am building a casual idler game that involves feeding, growing, and breeding shrimp. 
 I keep shrimp as a hobby and I love idler games so I am really enjoying this project. 
-![](other_images\Sample_Shrimp_King.png)
+![](/other_images/Sample_Shrimp_King.png)
 
 # Project Description (Current Implementations) 
 You will start off with an aquarium with 1 shrimp, you can feed this shrimp until it grows up to become an adult. 
