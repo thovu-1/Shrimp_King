@@ -58,7 +58,7 @@ class User:
                     if species in shrimps_to_save:
                         #print("Shrimp species", shrimp.species, " exists ID:", id)
                         print("Adding: ", shrimp.get_state(), "To state:", shrimps_to_save[species])
-                        shrimps_to_save[species].update(shrimp.get_state())
+                        shrimps_to_save.update({species:{shrimp.get_state()}})
                     else:
                         shrimps_to_save[species] = shrimp.get_state()
 
@@ -96,22 +96,22 @@ def create_new_user():
     #         Shrimp(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 3, 0, 'Crystal_Red', DIRECTION)]
     # d = {crs[0].id: crs[0], crs[1].id: crs[1], crs[2].id: crs[2]}
 
-    # crs = [Crystal_Red(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0)]
-    # shadow_panda = [Shadow_Panda(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0)]
-    # crystal_black = [Crystal_Black(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0)]
-    # pellet = Pellet(0,0,'classes/food/food_images/algae_wafer.png', 'algae_wafer', 10000)
-    # new_user = User([pellet], 'algae_wafer', 100, 1)
-    # new_user.shrimps['Crystal_Red'] = {crs[0].id: crs[0]}
-    # new_user.shrimps['Shadow_Panda'] = {shadow_panda[0].id: shadow_panda[0]}
-    # new_user.shrimps['Crystal_Black'] = {crystal_black[0].id: crystal_black[0]}
-    #print("Created new user: ", new_user)
-
+    crs = [Crystal_Red(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0)]
+    shadow_panda = [Shadow_Panda(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0)]
+    crystal_black = [Crystal_Black(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0)]
     pellet = Pellet(0,0,'classes/food/food_images/algae_wafer.png', 'algae_wafer', 10000)
     new_user = User([pellet], 'algae_wafer', 100, 1)
-    for i in range(50):
-        new_user.add_shrimp(Crystal_Red(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0))
-        new_user.add_shrimp(Shadow_Panda(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0))
-        new_user.add_shrimp(Crystal_Black(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0))
+    new_user.shrimps['Crystal_Red'] = {crs[0].id: crs[0]}
+    new_user.shrimps['Shadow_Panda'] = {shadow_panda[0].id: shadow_panda[0]}
+    new_user.shrimps['Crystal_Black'] = {crystal_black[0].id: crystal_black[0]}
+    print("Created new user: ", new_user)
+
+    # pellet = Pellet(0,0,'classes/food/food_images/algae_wafer.png', 'algae_wafer', 10000)
+    # new_user = User([pellet], 'algae_wafer', 100, 1)
+    # for i in range(50):
+    #     new_user.add_shrimp(Crystal_Red(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0))
+    #     new_user.add_shrimp(Shadow_Panda(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0))
+    #     new_user.add_shrimp(Crystal_Black(DEFAULT_SPAWN_X, DEFAULT_SPAWN_Y, 1, 0))
 
 
     return new_user
